@@ -7,6 +7,7 @@ from exchange.utils import get_or_create_currency
 class ExchangeSerializer(serializers.ModelSerializer):
     base_currency = serializers.CharField(source='base_currency.tag')
     quote_currency = serializers.CharField(source='quote_currency.tag')
+    price = serializers.FloatField()
 
     class Meta:
         model = Exchange
