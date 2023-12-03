@@ -1,31 +1,21 @@
 from rest_framework import serializers
 
-from exchange.models import Currency, Exchange
-
-
-class CurrencySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Currency
-        fields = ['tag']
+from exchange.models import Exchange
+from exchange.utils import get_or_create_currency
 
 
 class ExchangeSerializer(serializers.ModelSerializer):
-    base_currency = CurrencySerializer()
-    quote_currency = CurrencySerializer()
+    base_currency = serializers.CharField(source='base_currency.tag')
+    quote_currency = serializers.CharField(source='quote_currency.tag')
+    price = serializers.FloatField()
 
     class Meta:
         model = Exchange
         fields = ['date', 'base_currency', 'quote_currency', 'price']
 
-    def create(self, validated_data):
-        base_currency_data = validated_data.pop('base_currency')
-        quote_currency_data = validated_data.pop('quote_currency')
-        base_currency, _ = Currency.objects.get_or_create(**base_currency_data)
-        quote_currency, _ = Currency.objects.get_or_create(**quote_currency_data)
-        exchange = Exchange.objects.create(
-            base_currency=base_currency,
-            quote_currency=quote_currency,
-            **validated_data
-        )
+    def to_internal_value(self, data):
+        internal_value = super().to_internal_value(data)
+        internal_value['base_currency'] = get_or_create_currency(tag=internal_value['base_currency']['tag'])
+        internal_value['quote_currency'] = get_or_create_currency(tag=internal_value['quote_currency']['tag'])
+        return internal_value
 
-        return exchange
