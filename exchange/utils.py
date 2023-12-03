@@ -66,7 +66,7 @@ def find_indirect_rate(base_currency_id, quote_currency_id, date):
     graph = build_graph(dict_of_rates.keys())
     paths = find_all_paths(graph, base_currency_id, quote_currency_id)
     best_rate = chose_best_rate(paths, dict_of_rates)
-    return best_rate
+    return round(best_rate, 4)
 
 
 def build_graph(connections):
