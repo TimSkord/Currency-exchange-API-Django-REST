@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # 3rd party
     'rest_framework',
     'django_filters',
+    'drf_spectacular',
 
     # local
     'exchange.apps.ExchangeConfig',
@@ -93,6 +94,9 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'EXCEPTION_HANDLER': 'exchange.utils.custom_exception_handler',
+
 }
 
 # Password validation

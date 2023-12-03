@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import mixins
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -35,7 +36,15 @@ class ExchangeViewSet(ModelViewSet):
 
 
 class ExchangeRate(APIView):
-
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='base_currency__tag', description='Base currency tag', required=True, type=str),
+            OpenApiParameter(name='quote_currency__tag', description='Quote currency tag', required=True, type=str),
+            OpenApiParameter(name='date', description='Date for the exchange rate', required=True, type=str)
+        ],
+        responses={200: ExchangeSerializer,},
+        description="Retrieves the exchange rate for a given currency pair on a specific date."
+    )
     def get(self, request):
         base_currency_tag = request.GET.get('base_currency__tag')
         quote_currency_tag = request.GET.get('quote_currency__tag')
@@ -45,5 +54,5 @@ class ExchangeRate(APIView):
             'date': date,
             'base_currency': base_currency_tag,
             'quote_currency': quote_currency_tag,
-            'rate': rate
+            'price': rate
         })
